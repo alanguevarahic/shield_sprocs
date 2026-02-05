@@ -5,7 +5,34 @@ GO
 
 IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[sp_GetTaskMasterSchedules]') AND type IN (N'P', N'PC'))
 BEGIN
-    EXEC('CREATE PROCEDURE [dbo].[sp_GetTaskMasterSchedules] AS BEGIN SET NOCOUNT ON; END')
+    EXEC('CREATE PROCEDURE [dbo].[sp_GetTaskMasterSchedules]
+        @UnitId INT = NULL,
+        @CompanyLevelId INT = NULL,
+        @AssetTypes NVARCHAR(MAX),
+        @TaskName NVARCHAR(100) = NULL,
+        @NextDateFrom DATETIME = NULL,
+        @NextDateTo DATETIME = NULL,
+        @LastDateFrom DATETIME = NULL,
+        @LastDateTo DATETIME = NULL,
+        @AllTags BIT = 1,
+        @TankIds NVARCHAR(MAX) = '''',
+        @PipingIds NVARCHAR(MAX) = '''',
+        @PipelineIds NVARCHAR(MAX) = '''',
+        @PressureVesselIds NVARCHAR(MAX) = '''',
+        @PsvIds NVARCHAR(MAX) = '''',
+        @ThicknessTask NVARCHAR(10) = '''',
+        @RbiTask NVARCHAR(10) = '''',
+        @ActiveAssetsOnly BIT = 0,
+        @ActiveUnitsOnly BIT = 0,
+        @ShowNonPsmAssets BIT = 1,
+        @ActiveSchedulesOnly BIT = 0,
+        @Manager NVARCHAR(100) = '''',
+        @Page INT = 1,
+        @PageSize INT = 50,
+        @SortBy NVARCHAR(50) = ''unit_id'',
+        @IsDesc BIT = 0,
+        @CountOnly BIT = 0
+    AS BEGIN SET NOCOUNT ON; END')
 END
 GO
 
@@ -94,8 +121,8 @@ BEGIN
             au.active AS unit_active,
             au.manager AS unit_manager,
             au.parent_level_id AS unit_parent_level_id,
-            tmr.conditional_interval AS rule_conditional_interval,
-            tmr.next_cml_due_date AS rule_next_cml_due_date,
+            ISNULL(tmr.conditional_interval, 0) AS rule_conditional_interval,
+            ISNULL(tmr.next_cml_due_date, 0) AS rule_next_cml_due_date,
             CASE tms.asset_type
                 WHEN 'tank' THEN (SELECT active FROM AtmTank WHERE id = tms.tag_id)
                 WHEN 'piping' THEN (SELECT active FROM Piping WHERE id = tms.tag_id)

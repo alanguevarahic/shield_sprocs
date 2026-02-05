@@ -4,7 +4,28 @@ GO
 
 IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[sp_GetRecommendationsCount]') AND type IN (N'P', N'PC'))
 BEGIN
-    EXEC('CREATE PROCEDURE [dbo].[sp_GetRecommendationsCount] AS BEGIN SET NOCOUNT ON; END')
+    EXEC('CREATE PROCEDURE [dbo].[sp_GetRecommendationsCount]
+        @UnitId INT = NULL,
+        @CompanyLevelId INT = NULL,
+        @AssetTypes NVARCHAR(MAX),
+        @TaskName NVARCHAR(100) = NULL,
+        @TargetDateFrom DATETIME = NULL,
+        @TargetDateTo DATETIME = NULL,
+        @CompletionDateFrom DATETIME = NULL,
+        @CompletionDateTo DATETIME = NULL,
+        @Scorecards NVARCHAR(MAX) = '''',
+        @PriorityIds NVARCHAR(MAX) = '''',
+        @AllTags BIT = 1,
+        @TankIds NVARCHAR(MAX) = '''',
+        @PipingIds NVARCHAR(MAX) = '''',
+        @PipelineIds NVARCHAR(MAX) = '''',
+        @PressureVesselIds NVARCHAR(MAX) = '''',
+        @PsvIds NVARCHAR(MAX) = '''',
+        @ActiveAssetsOnly BIT = 0,
+        @ActiveUnitsOnly BIT = 0,
+        @ShowNonPsmAssets BIT = 1,
+        @Manager NVARCHAR(100) = ''''
+    AS BEGIN SET NOCOUNT ON; END')
 END
 GO
 
