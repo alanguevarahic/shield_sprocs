@@ -121,8 +121,8 @@ BEGIN
             au.active AS unit_active,
             au.manager AS unit_manager,
             au.parent_level_id AS unit_parent_level_id,
-            tmr.conditional_interval AS rule_conditional_interval,
-            tmr.next_cml_due_date AS rule_next_cml_due_date,
+            ISNULL(tmr.conditional_interval, 0) AS rule_conditional_interval,
+            ISNULL(tmr.next_cml_due_date, 0) AS rule_next_cml_due_date,
             CASE tms.asset_type
                 WHEN 'tank' THEN (SELECT active FROM AtmTank WHERE id = tms.tag_id)
                 WHEN 'piping' THEN (SELECT active FROM Piping WHERE id = tms.tag_id)
