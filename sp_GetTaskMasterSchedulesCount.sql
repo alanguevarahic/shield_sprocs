@@ -5,7 +5,29 @@ GO
 
 IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[sp_GetTaskMasterSchedulesCount]') AND type IN (N'P', N'PC'))
 BEGIN
-    EXEC('CREATE PROCEDURE [dbo].[sp_GetTaskMasterSchedulesCount] AS BEGIN SET NOCOUNT ON; END')
+    EXEC('CREATE PROCEDURE [dbo].[sp_GetTaskMasterSchedulesCount]
+        @UnitId INT = NULL,
+        @CompanyLevelId INT = NULL,
+        @AssetTypes NVARCHAR(MAX),
+        @TaskName NVARCHAR(100) = NULL,
+        @NextDateFrom DATETIME = NULL,
+        @NextDateTo DATETIME = NULL,
+        @LastDateFrom DATETIME = NULL,
+        @LastDateTo DATETIME = NULL,
+        @AllTags BIT = 1,
+        @TankIds NVARCHAR(MAX) = '''',
+        @PipingIds NVARCHAR(MAX) = '''',
+        @PipelineIds NVARCHAR(MAX) = '''',
+        @PressureVesselIds NVARCHAR(MAX) = '''',
+        @PsvIds NVARCHAR(MAX) = '''',
+        @ThicknessTask NVARCHAR(10) = '''',
+        @RbiTask NVARCHAR(10) = '''',
+        @ActiveAssetsOnly BIT = 0,
+        @ActiveUnitsOnly BIT = 0,
+        @ShowNonPsmAssets BIT = 1,
+        @ActiveSchedulesOnly BIT = 0,
+        @Manager NVARCHAR(100) = ''''
+    AS BEGIN SET NOCOUNT ON; END')
 END
 GO
 
