@@ -140,16 +140,19 @@ BEGIN
               OR tmt.asset_type NOT IN ('tank', 'piping', 'pipeline', 'pressure-vessel', 'psv')
           )
     )
+    SELECT id, target_date, completion_date, score_card, priority_name, activity_completed_date, days_since_completed
+    INTO #FilteredRecommendations
+    FROM FilteredRecommendations;
 
     -- Result Set 1: byTargetDate (Overdue first, then by month in chronological order)
     SELECT [date], [count]
     FROM (
         SELECT 'Overdue' AS [date], COUNT(*) AS [count], 0 AS sort_order, CAST('1900-01-01' AS DATE) AS sort_date
-        FROM FilteredRecommendations
+        FROM #FilteredRecommendations
         WHERE completion_date IS NULL AND target_date < @Today
         UNION ALL
         SELECT FORMAT(MIN(target_date), 'MMM-yyyy') AS [date], COUNT(*) AS [count], 1 AS sort_order, DATEFROMPARTS(YEAR(MIN(target_date)), MONTH(MIN(target_date)), 1) AS sort_date
-        FROM FilteredRecommendations
+        FROM #FilteredRecommendations
         WHERE completion_date IS NULL AND target_date >= @Today
         GROUP BY YEAR(target_date), MONTH(target_date)
     ) AS byTargetDate
@@ -157,14 +160,14 @@ BEGIN
 
     -- Result Set 2: byScoreCard
     SELECT fr.score_card AS [date], COUNT(*) AS [count]
-    FROM FilteredRecommendations fr
+    FROM #FilteredRecommendations fr
     WHERE (@OnlyOpenRecommendations = 0 OR fr.completion_date IS NULL)
     GROUP BY fr.score_card
     ORDER BY fr.score_card;
 
     -- Result Set 3: byPriorityOpen (open recommendations only)
     SELECT fr.priority_name AS [date], COUNT(*) AS [count]
-    FROM FilteredRecommendations fr
+    FROM #FilteredRecommendations fr
     WHERE fr.completion_date IS NULL
     GROUP BY fr.priority_name
     ORDER BY fr.priority_name;
@@ -180,7 +183,7 @@ BEGIN
             SUM(CASE WHEN completion_date IS NULL AND target_date >= @Today THEN 1 ELSE 0 END) AS open_on_time,
             SUM(CASE WHEN completion_date IS NULL AND target_date < @Today THEN 1 ELSE 0 END) AS open_overdue,
             SUM(CASE WHEN completion_date IS NOT NULL THEN 1 ELSE 0 END) AS closed
-        FROM FilteredRecommendations
+        FROM #FilteredRecommendations
     ) AS pct;
 
     -- Result Set 5: allPrioritiesData
@@ -191,7 +194,7 @@ BEGIN
         SUM(CASE WHEN fr.completion_date IS NULL AND fr.days_since_completed / @DaysPerMonth >= 6 AND fr.days_since_completed / @DaysPerMonth < 12 THEN 1 ELSE 0 END) AS betweenSixAndTwelveMonthsCount,
         SUM(CASE WHEN fr.completion_date IS NULL AND fr.days_since_completed / @DaysPerMonth >= 12 AND fr.days_since_completed / @DaysPerMonth < 24 THEN 1 ELSE 0 END) AS betweenTwelveAndTwentyFourMonthsCount,
         SUM(CASE WHEN fr.completion_date IS NULL AND fr.days_since_completed / @DaysPerMonth >= 24 THEN 1 ELSE 0 END) AS moreThanTwentyFourCount
-    FROM FilteredRecommendations fr
+    FROM #FilteredRecommendations fr
     GROUP BY fr.priority_name
     ORDER BY fr.priority_name;
 END;
