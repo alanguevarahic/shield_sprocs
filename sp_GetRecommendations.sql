@@ -1,3 +1,4 @@
+SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
@@ -63,6 +64,8 @@ ALTER PROCEDURE [dbo].[sp_GetRecommendations]
 AS
 BEGIN
     SET NOCOUNT ON;
+
+    IF @Page < 1 SET @Page = 1;
 
     DECLARE @AssetTypesList TABLE (AssetType NVARCHAR(50));
     INSERT INTO @AssetTypesList (AssetType)

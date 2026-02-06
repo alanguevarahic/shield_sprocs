@@ -62,6 +62,8 @@ AS
 BEGIN
     SET NOCOUNT ON;
 
+    IF @Page < 1 SET @Page = 1;
+
     -- Parse asset types into temp table
     DECLARE @AssetTypesList TABLE (AssetType NVARCHAR(50));
     INSERT INTO @AssetTypesList (AssetType)
