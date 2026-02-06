@@ -67,6 +67,8 @@ AS
 BEGIN
     SET NOCOUNT ON;
 
+    IF @Page < 1 SET @Page = 1;
+
     DECLARE @AssetTypesList TABLE (AssetType NVARCHAR(50));
     INSERT INTO @AssetTypesList (AssetType)
     SELECT TRIM(value) FROM STRING_SPLIT(@AssetTypes, ',');
